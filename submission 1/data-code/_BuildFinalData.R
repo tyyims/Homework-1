@@ -1,6 +1,6 @@
 
 # Meta --------------------------------------------------------------------
-# Author:        Ian McCarthy
+# Author:        Taeyoung
 # Date Created:  7/8/2019
 # Date Edited:   1/24/2022
 # Notes:         R file to build Medicare Advantage dataset
