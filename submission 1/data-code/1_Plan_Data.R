@@ -2,9 +2,8 @@
 ## Read in enrollment data for january of each year
 #########################################################################
 
-for (y in 2007:2015) {
+for (y in 2010:2015) {
   ## Basic contract/plan information
-  y=2010
   ma.path=paste0("data/input/monthly-ma-and-pdp-enrollment-by-cpsc/CPSC_Contract_Info_",y,"_01.csv")
   contract.info=read_csv(ma.path,
                          skip=1,
@@ -24,7 +23,7 @@ for (y in 2007:2015) {
                            plan_name = col_character(),
                            parent_org = col_character(),
                            contract_date = col_character()
-                         ))
+                         ))    
 
   contract.info = contract.info %>%
     group_by(contractid, planid) %>%
@@ -49,7 +48,9 @@ for (y in 2007:2015) {
                        enrollment = col_double()
                        ),na="*")
     
-
+  enroll.info <- enroll.info %>%
+    mutate(planid = ifelse(is.na(planid) | planid == "", NA, planid))
+  
   ## Merge contract info with enrollment info
   plan.data = contract.info %>%
     left_join(enroll.info, by=c("contractid", "planid")) %>%
@@ -79,10 +80,19 @@ for (y in 2007:2015) {
   write_rds(plan.year,paste0("data/output/ma_data_",y,".rds"))
 }
 
-full.ma.data <- read_rds("data/output/ma_data_2007.rds")
-for (y in 2008:2015) {
+full.ma.data <- read_rds("data/output/ma_data_", y, ".rds")
+for (y in 2010:2015) {
   full.ma.data <- rbind(full.ma.data,read_rds(paste0("data/output/ma_data_",y,".rds")))
+}
+# testing if the rds file is exsisting
+for (y in 2010:2015) {
+  file_path <- paste0("data/output/ma_data_", y, ".rds")
+  if (file.exists(file_path)) {
+    full.ma.data <- rbind(full.ma.data, readRDS(file_path))
+  } else {
+    warning(paste("File not found:", file_path))
+  }
 }
 
 write_rds(full.ma.data,"data/output/full_ma_data.rds")
-sapply(paste0("ma_data_", 2007:2015, ".rds"), unlink)
+sapply(paste0("ma_data_", 2010:2015, ".rds"), unlink)

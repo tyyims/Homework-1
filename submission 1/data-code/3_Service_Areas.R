@@ -23,7 +23,8 @@ monthlist_2015=c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11
 
 
 ## Read in monthly files, append to yearly file, fill in missing info, and collapse down to yearly file
-for (y in 2006:2015) {
+for (y in 2010:2015) {
+  y=2010
   monthlist=get(paste0("monthlist_",y))
   step=0
   for (m in monthlist) {
