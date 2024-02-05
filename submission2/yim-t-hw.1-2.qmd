@@ -1,0 +1,116 @@
+---
+title: "yim-t-hw.1-2"
+name: "Taeyoung Yim"
+date: 01/31/2024
+---
+
+# Question 1
+```{r}
+num_observations <- nrow(full.ma.data)
+cat("Number of observations in the dataset:", num_observations, "\n")
+```
+
+# Question 2
+```{r}
+num_plan_types <- length(unique(full.ma.data$plan_type))
+cat("Number of different plan types:", num_plan_types, "\n")
+```
+
+# Question 3
+```{r}
+library(dplyr)
+library(tidyr)
+
+plans_count_table <- full.ma.data %>%
+  group_by(year, plan_type) %>%
+  summarise(count = n()) %>%
+  pivot_wider(names_from = year, values_from = count, values_fill = 0)
+print(plans_count_table)
+```
+
+# Question 4
+```{r}
+library(dplyr)
+library(tidyr)
+filtered_ma_data <- full.ma.data %>%
+  filter(!grepl("SNP", plan_type, ignore.case = TRUE)) %>%
+  filter(!grepl("EGHP", plan_type, ignore.case = TRUE)) %>%
+  filter(!grepl("^800", plan_type, ignore.case = TRUE))
+filtered_plans_count_table <- filtered_ma_data %>%
+  group_by(year, plan_type) %>%
+  summarise(count = n()) %>%
+  pivot_wider(names_from = year, values_from = count, values_fill = 0)
+print(filtered_plans_count_table)
+```
+
+# Question 5
+```{r}
+library(ggplot2)
+merged_data <- merge(enrollment, service_area, by = c("contractid", "county", "state"))
+approved_data <- merged_data[merged_data$approved == 1, ]
+valid_enrollment_data <- approved_data[!is.na(approved_data$enrollment), ]
+average_enrollees <- aggregate(enrollment ~ county + year, data = valid_enrollment_data, FUN = mean)
+
+ggplot(average_enrollees, aes(x = year, y = enrollment, fill = county)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Medicare Advantage Enrollees per County (2010-2015)",
+       x = "Year",
+       y = "Average Enrollees") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+```
+
+# Question 6
+```{r}
+merged_service_area <- merge(service_area, penetration_data, by = c("state", "county"))
+merged_enrollment <- merge(enrollment, merged_service_area, by = c("contractid", "state", "county"))
+merged_data <- merge(merged_enrollment, plan_characteristics, by = c("planid", "state", "county"))
+approved_data <- merged_data[merged_data$approved == 1, ]
+valid_data <- approved_data[!is.na(approved_data$enrollment) & !is.na(approved_data$premium), ]
+average_premium <- aggregate(premium ~ year, data = valid_data, FUN = mean)
+
+
+ggplot(average_premium, aes(x = year, y = premium)) +
+  geom_line() +
+  labs(title = "Average Plan Premium Over Time",
+       x = "Year",
+       y = "Average Premium") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+```
+
+# Question 7
+```{r}
+merged_service_area <- merge(service_area, penetration_data, by = c("state", "county"))
+merged_enrollment <- merge(enrollment, merged_service_area, by = c("contractid", "state", "county"))
+merged_data <- merge(merged_enrollment, plan_characteristics, by = c("planid", "state", "county"))
+approved_data <- merged_data[merged_data$approved == 1, ]
+valid_data <- approved_data[!is.na(approved_data$enrollment) & !is.na(approved_data$premium), ]
+valid_data$zero_premium <- ifelse(valid_data$premium == 0, 1, 0)
+percentage_zero_premium <- aggregate(zero_premium ~ year, data = valid_data, FUN = function(x) mean(x) * 100)
+
+ggplot(percentage_zero_premium, aes(x = year, y = zero_premium)) +
+  geom_line() +
+  labs(title = "Percentage of $0 Premium Plans Over Time",
+       x = "Year",
+       y = "Percentage of $0 Premium Plans") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +  
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+
+```
+
+# Question 8
+```{r}
+print("800-series are plans that are offered by the third party. So, it might be excluded in order to compare plans that are offered by public insurance like Medicare and Medicaid.")
+```
+
+# Question 9
+```{r}
+print("$0 premium is set in order to attract people. To beneficiaries, this means that they do not have to pay the monthly fee while they still have to pay for the out-of-pocket cost.")
+```
+
+# Question 10
+```{r}
+print("It was extremely difficult by the first submission, but once getting used to how to use this software, I feel like the difficulty that I feel is getting lower. Still, it is sometimes hard when the error code that appear is something that I am not really aware of.")
+```

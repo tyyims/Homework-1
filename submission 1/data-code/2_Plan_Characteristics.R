@@ -1,7 +1,5 @@
-#########################################################################
-## Read and clean data basic premium and deductible information
-#########################################################################  
-## Raw 2010 data
+library(readr)
+library(readxl)
 ma.path.2010a=paste0("data/input/ma-plan-characteristics/2010LandscapeSourceData_MA_12_01_09_A_to_M.csv")
 ma.data.2010a=read_csv(ma.path.2010a,
                        skip=5,
@@ -54,39 +52,17 @@ ma.data.2010b=read_csv(ma.path.2010b,
 ma.data.2010 = rbind(ma.data.2010a,ma.data.2010b)
 
 
-#macd.path.2010a=paste0("data/input/ma-plan-characteristics/Medicare Part D 2010 Plan Report 09-14-09.xls")
-#macd.data.2010a=read_xls(macd.path.2010a,
-#                         range="A5:AC26372",
-#                         sheet="Alabama to Montana",
-#                         col_names=c("state","county","org_name","plan_name","contractid","planid","segmentid",
-#                                     "org_type","plan_type","snp","snp_type","benefit_type","below_benchmark",
-#                                     "national_pdp","partd_rein_demo","partd_rein_demo_type","premium_partc",
-#                                     "premium_partd_basic","premium_partd_supp","premium_partd_total",
-#                                     "pard_assist_full","partd_assist_75","partd_assist_50","partd_assist_25",
-#                                     "partd_deductible","deductible_exclusions","increase_coverage_limit",
-#                                     "gap_coverage","gap_coverage_type"))
-#test
-# Assuming macd.path.2010a is your file path
-macd.data.2010a <- read_xls(
-  macd.path.2010a,
-  range = "A5:AC26372",
-  sheet = "Alabama to Montana",
-  col_names = c("state", "county", "org_name", "plan_name", "contractid", "planid", "segmentid",
-                "org_type", "plan_type", "snp", "snp_type", "benefit_type", "below_benchmark",
-                "national_pdp", "partd_rein_demo", "partd_rein_demo_type", "premium_partc",
-                "premium_partd_basic", "premium_partd_supp", "premium_partd_total",
-                "pard_assist_full", "partd_assist_75", "partd_assist_50", "partd_assist_25",
-                "partd_deductible", "deductible_exclusions", "increase_coverage_limit",
-                "gap_coverage", "gap_coverage_type"),
-  col_types = "text"  # Use text type for the problematic column
-)
-
-# Identify and clean the problematic entries
-problematic_rows <- which(!grepl("^(TRUE|FALSE)$", macd.data.2010a$gap_coverage))
-macd.data.2010a$gap_coverage[problematic_rows] <- NA  # Set problematic entries to NA or correct them as needed
-
-# Now, continue with your analysis using macd.data.2010a
-
+macd.path.2010a=paste0("data/input/ma-plan-characteristics/Medicare Part D 2010 Plan Report 09-14-09.xls")
+macd.data.2010a=read_xls(macd.path.2010a,
+                         range="A5:AC26372",
+                         sheet="Alabama to Montana",
+                         col_names=c("state","county","org_name","plan_name","contractid","planid","segmentid",
+                                     "org_type","plan_type","snp","snp_type","benefit_type","below_benchmark",
+                                     "national_pdp","partd_rein_demo","partd_rein_demo_type","premium_partc",
+                                     "premium_partd_basic","premium_partd_supp","premium_partd_total",
+                                     "pard_assist_full","partd_assist_75","partd_assist_50","partd_assist_25",
+                                     "partd_deductible","deductible_exclusions","increase_coverage_limit",
+                                     "gap_coverage","gap_coverage_type"))
 
 macd.path.2010b=paste0("data/input/ma-plan-characteristics/Medicare Part D 2010 Plan Report 09-14-09.xls")
 macd.data.2010b=read_xls(macd.path.2010b,
@@ -346,56 +322,29 @@ macd.data.2013 = rbind(macd.data.2013a,macd.data.2013b)
 
 
 ## Raw 2014 data
-#ma.path.2014a=paste0("data/input/ma-plan-characteristics/2014LandscapeSource file MA_AtoM 05292014.csv")
-#ma.data.2014a=read_csv(ma.path.2014a,
-#                       skip=6,
-#                       col_names=c("state","county","org_name","plan_name","plan_type","premium","partd_deductible",
-#                                   "drug_type","gap_coverage","drug_type_detail","contractid",
-#                                   "planid","segmentid","moop","star_rating"),
-#                       col_types = cols(
-#                         state = col_character(),
-#                         county = col_character(),
-#                         org_name = col_character(),
-#                         plan_name = col_character(),
-#                         plan_type = col_character(),
-#                         premium = col_number(),
-#                         partd_deductible = col_number(),
-#                         drug_type = col_character(),
-#                         gap_coverage = col_character(),
-#                         drug_type_detail = col_character(),
-#                         contractid = col_character(),
-#                         planid = col_double(),
-#                         segmentid = col_double(),
-#                         moop = col_character(),
-#                         star_rating = col_character()
-#                       ))
-#test
-ma.data.2014a <- read_csv(
-  ma.path.2014a,
-  skip = 6,
-  col_names = c("state", "county", "org_name", "plan_name", "plan_type", "premium", "partd_deductible",
-                "drug_type", "gap_coverage", "drug_type_detail", "contractid", "planid", "segmentid",
-                "moop", "star_rating"),
-  col_types = cols(
-    state = col_character(),
-    county = col_character(),
-    org_name = col_character(),
-    plan_name = col_character(),
-    plan_type = col_character(),
-    premium = col_number(),
-    partd_deductible = col_number(),
-    drug_type = col_character(),
-    gap_coverage = col_character(),
-    drug_type_detail = col_character(),
-    contractid = col_character(),
-    planid = col_character(),
-    segmentid = col_character(),
-    moop = col_character(),
-    star_rating = col_character()
-  )
-)
-ma.data.2014a$premium <- as.numeric(gsub("\\$", "", ma.data.2014a$premium))
-ma.data.2014a$partd_deductible <- as.numeric(gsub("\\$", "", ma.data.2014a$partd_deductible))
+ma.path.2014a=paste0("data/input/ma-plan-characteristics/2014LandscapeSource file MA_AtoM 05292014.csv")
+ma.data.2014a=read_csv(ma.path.2014a,
+                       skip=6,
+                       col_names=c("state","county","org_name","plan_name","plan_type","premium","partd_deductible",
+                                   "drug_type","gap_coverage","drug_type_detail","contractid",
+                                   "planid","segmentid","moop","star_rating"),
+                       col_types = cols(
+                         state = col_character(),
+                         county = col_character(),
+                         org_name = col_character(),
+                         plan_name = col_character(),
+                         plan_type = col_character(),
+                         premium = col_number(),
+                         partd_deductible = col_number(),
+                         drug_type = col_character(),
+                         gap_coverage = col_character(),
+                         drug_type_detail = col_character(),
+                         contractid = col_character(),
+                         planid = col_double(),
+                         segmentid = col_double(),
+                         moop = col_character(),
+                         star_rating = col_character()
+                       ))
 
 
 ma.path.2014b=paste0("data/input/ma-plan-characteristics/2014LandscapeSource file MA_NtoW 05292014.csv")
@@ -529,7 +478,7 @@ macd.data.2015 = rbind(macd.data.2015a,macd.data.2015b)
 
 
 for (y in 2010:2015) {
-
+library(dplyr)
   ############ CLEAN MA-Only Data #####################
   ma.data=get(paste0("ma.data.",y))
   ma.data = ma.data %>%
@@ -583,71 +532,5 @@ for (y in 2010:2015) {
   
   
 }
-
-#test
-for (y in 2010:2015) {
-  
-  ############ CLEAN MA-Only Data #####################
-  ma.data = get(paste0("ma.data.", y))
-  ma.data = ma.data %>%
-    select(contractid, planid, state, county, premium)
-  
-  ## Fill in missing plan info (by contract, plan, state, and county)
-  ma.data = ma.data %>%
-    group_by(contractid, planid, state, county) %>%
-    fill(premium)
-  
-  ## Remove duplicates
-  ma.data = ma.data %>%
-    group_by(contractid, planid, state, county) %>%
-    mutate(id_count = row_number())
-  
-  ma.data = ma.data %>%
-    filter(id_count == 1) %>%
-    select(-id_count)
-  
-  ############ CLEAN MA-PD Data #####################
-  macd.data = get(paste0("macd.data.", y))
-  macd.data = macd.data %>% 
-    select(contractid, planid, state, county, premium_partc, premium_partd_basic, 
-           premium_partd_supp, premium_partd_total, partd_deductible)
-  
-  macd.data = macd.data %>%
-    group_by(contractid, planid, state, county) %>%
-    fill(premium_partc, premium_partd_basic, premium_partd_supp, premium_partd_total, partd_deductible)
-  
-  ## Remove duplicates
-  macd.data = macd.data %>%
-    group_by(contractid, planid, state, county) %>%
-    mutate(id_count = row_number())
-  
-  macd.data = macd.data %>%
-    filter(id_count == 1) %>%
-    select(-id_count)
-  
-  # Convert relevant columns to character
-  ma.data$planid = as.character(ma.data$planid)
-  macd.data$planid = as.character(macd.data$planid)
-  
-  # Convert premium_partc to character
-  macd.data$premium_partc = as.character(macd.data$premium_partc)
-  
-  ## Merge Part D info to Part C info
-  ma.macd.data = full_join(ma.data, macd.data, 
-                           by = c("contractid", "planid", "state", "county")) %>%
-    mutate(year = y)
-  
-  if (y == 2010) {
-    plan.premiums = ma.macd.data
-  } else {
-    plan.premiums = bind_rows(plan.premiums, ma.macd.data)
-  }
-  
-}
-
-# Rest of your code...
-
-
-
 
 write_rds(plan.premiums,"data/output/plan_premiums.rds")
